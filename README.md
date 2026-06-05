@@ -26,7 +26,9 @@ To build and launch the application directly from your terminal using the standa
    ```bash
    mvn clean package
 
-2. **Run the standalone** JAR file in your terminal or PowerShell java -jar target/TechProductManager-1.0-SNAPSHOT-jar-with-dependencies.jar
+2. **Run the standalone** JAR file in your terminal or PowerShell:
+   ```bash
+   java -jar target/TechProductManager-1.0-SNAPSHOT-jar-with-dependencies.jar
 
 ## 📦 Project Structure
 
