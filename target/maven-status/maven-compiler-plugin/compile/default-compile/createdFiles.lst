@@ -1,8 +1,8 @@
-com\mycompany\techproductmanagerdb\Backend\Sale.class
-com\mycompany\techproductmanagerdb\Backend\Manufacturer.class
-com\mycompany\techproductmanagerdb\Backend\Product.class
-com\mycompany\techproductmanagerdb\Frontend\ConsoleUI.class
-com\mycompany\techproductmanagerdb\Backend\Computer.class
-com\mycompany\techproductmanagerdb\Backend\MobilePhone.class
-com\mycompany\techproductmanagerdb\Backend\Shop.class
-com\mycompany\techproductmanagerdb\Backend\DBConnection.class
+com\mycompany\techproductmanager\Frontend\ConsoleUI.class
+com\mycompany\techproductmanager\Backend\MobilePhone.class
+com\mycompany\techproductmanager\Backend\Sale.class
+com\mycompany\techproductmanager\Backend\DBConnection.class
+com\mycompany\techproductmanager\Backend\Manufacturer.class
+com\mycompany\techproductmanager\Backend\Shop.class
+com\mycompany\techproductmanager\Backend\Computer.class
+com\mycompany\techproductmanager\Backend\Product.class
