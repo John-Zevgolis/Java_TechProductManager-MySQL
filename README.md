@@ -18,6 +18,16 @@ A robust, Object-Oriented CLI application built in Java for managing tech produc
 * **Connectivity:** JDBC (Java Database Connectivity)
 * **Build/IDE:** NetBeans / Apache Ant / Maven
 
+## 💻 How to Run
+
+To build and launch the application directly from your terminal using the standalone executable package (Fat JAR), follow these steps:
+
+1. **Build the project** using Maven to package the source code along with the MySQL driver dependencies:
+   ```bash
+   mvn clean package
+
+2. **Run the standalone** JAR file in your terminal or PowerShell java -jar target/TechProductManager-1.0-SNAPSHOT-jar-with-dependencies.jar
+
 ## 📦 Project Structure
 
 ```text
