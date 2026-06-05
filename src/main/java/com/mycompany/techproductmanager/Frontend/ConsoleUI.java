@@ -59,9 +59,9 @@ public class ConsoleUI {
             
             System.out.println("     Μ Ε Ν Ο Υ   Δ Ι Α Χ Ε Ι Ρ Ι Σ Η Σ");
             System.out.println("     ====================================\n");
-            System.out.println("[1]...Διαχείριση Υπολογιστών (Εισαγωγή/Διόρθωση/Διαγραφή)");
-            System.out.println("[2]...Διαχείριση Κινητών (Εισαγωγή/Διόρθωση/Διαγραφή)");
-            System.out.println("[3]...Διαχείριση Κατασκευαστών (Εισαγωγή/Προβολή)");
+            System.out.println("[1]...Διαχείριση Υπολογιστών (Προβολή/Εισαγωγή/Διόρθωση/Διαγραφή)");
+            System.out.println("[2]...Διαχείριση Κινητών (Προβολή/Εισαγωγή/Διόρθωση/Διαγραφή)");
+            System.out.println("[3]...Διαχείριση Κατασκευαστών (Προβολή/Εισαγωγή/Διόρθωση/Διαγραφή)");
             System.out.println("[4]...Νέα Πώληση Προϊόντος");
             System.out.println("[5]...Στατιστικά Πωλήσεων & Αναφορές");
             System.out.println("[6]...Έξοδος");
@@ -817,7 +817,9 @@ public class ConsoleUI {
             System.out.println("     ==================================================\n");
             System.out.println("[1]...Προβολή Κατασκευαστών");
             System.out.println("[2]...Προσθήκη Νέου Κατασκευαστή");
-            System.out.println("[3]...Επιστροφή στο Κεντρικό Μενού");
+            System.out.println("[3]...Διόρθωση Στοιχείων Κατασκευαστή");
+            System.out.println("[4]...Διαγραφή Κατασκευαστή");
+            System.out.println("[5]...Επιστροφή στο Κεντρικό Μενού");
             System.out.print("\nΕπιλογή : ");
             
             try {
@@ -833,13 +835,17 @@ public class ConsoleUI {
                     break;
                 case 2: addManufacturer();
                     break;
-                case 3: 
+                case 3: updateManufacturer();
+                    break;
+                case 4: deleteManufacturer();
+                    break;
+                case 5: 
                     break;
                 default: 
                     System.out.println("Λάθος επιλογή!");
                     pause();
             }
-        } while (choice != 3); 
+        } while (choice != 5); 
     }
     
     /**
@@ -901,6 +907,123 @@ public class ConsoleUI {
         shop.insertManufacturer(manufacturer);
         
         System.out.println("Ο κατασκευαστής προστέθηκε επιτυχώς!");
+        pause();
+    }
+    
+    /**
+     * Επιτρέπει την εύρεση και την πλήρη επεξεργασία των στοιχείων ενός κατασκευαστή
+     * (Όνομα και Email Κατασκευαστή) με βάση το ID του.
+     */
+    public void updateManufacturer() {
+        String name;
+        String email;
+        
+        clsWin();
+        
+        System.out.println("    ΔΙΟΡΘΩΣΗ ΣΤΟΙΧΕΙΩΝ ΚΑΤΑΣΚΕΥΑΣΤΗ");
+        System.out.println("    -----------------------------\n");
+        
+        if (shop.getManufacturers().isEmpty()) {
+            System.out.println("Δεν υπάρχουν διαθέσιμοι κατασκευαστές.");
+            pause();
+            return;
+        }
+        
+        System.out.println("Λίστα Κατασκευαστών:");
+        for (Manufacturer manufacturer : shop.getManufacturers()) {
+            System.out.println("[ID: " + manufacturer.getId() + "] - " + manufacturer.getName());
+        }
+        
+        int manufacturerId = -1;
+        boolean isFound = false;
+
+        do {
+            try {
+                System.out.print("\nΔώσε το ID του κατασκευαστή προς διόρθωση (ή 0 για ακύρωση): ");
+                manufacturerId = Integer.parseInt(scanner.nextLine());
+
+                if (manufacturerId == 0) {
+                    System.out.println("Η διόρθωση ακυρώθηκε.");
+                    pause();
+                    return;
+                }
+                
+                Manufacturer manufacturer = shop.getManufacturer(manufacturerId);
+                if(manufacturer == null) {
+                    System.out.println("Λάθος ID! Δεν βρέθηκε κατασκευαστής με αυτό το ID. Ξαναδοκίμασε.");
+                } else {
+                    isFound = true;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Μη αριθμητικό ID! Παρακαλώ δώστε μόνο ψηφία.");
+            }
+        } while (!isFound);
+        
+        Manufacturer manufacturer = shop.getManufacturer(manufacturerId);
+        
+        System.out.print("Όνομα: ");
+        name = scanner.nextLine();
+        manufacturer.setName(name);
+        
+        System.out.print("Email: ");
+        email = scanner.nextLine();
+        manufacturer.setEmail(email);
+        
+        shop.updateManufacturer(manufacturer);
+        
+        System.out.println("Ο κατασκευαστής διορθώθηκε επιτυχώς!");
+        
+        pause();
+    }
+    
+    /**
+     * Αναλαμβάνει τη διαδικασία οριστικής διαγραφής ενός κατασκευαστή από το σύστημα 
+     * με βάση το ID που εισάγει ο χρήστης.
+     */
+    public void deleteManufacturer() {
+        clsWin();
+        
+        System.out.println("    ΔΙΑΓΡΑΦΗ ΚΑΤΑΣΚΕΥΑΣΤΗ");
+        System.out.println("    -------------------\n");
+        
+        if (shop.getManufacturers().isEmpty()) {
+            System.out.println("Δεν υπάρχουν διαθέσιμοι κατασκευαστές.");
+            pause();
+            return;
+        }
+
+        System.out.println("Λίστα Kακασκευαστών:");
+        for (Manufacturer manufacturer : shop.getManufacturers()) {
+            System.out.println("[ID: " + manufacturer.getId() + "] - " + manufacturer.getName());
+        }
+        
+        int manufacturerId;
+        boolean isDeleted = false;
+
+        do {
+            try {
+                System.out.print("\nΔώσε το ID του κατασκευαστή προς διαγραφή (ή 0 για ακύρωση): ");
+                manufacturerId = Integer.parseInt(scanner.nextLine());
+
+                if (manufacturerId == 0) {
+                    System.out.println("Η διαγραφή ακυρώθηκε.");
+                    pause();
+                    return;
+                }
+                
+                Manufacturer manufacturer = shop.getManufacturer(manufacturerId);
+                if(manufacturer == null) {
+                    System.out.println("Λάθος ID! Δεν βρέθηκε κατασκευαστής με αυτό το ID. Ξαναδοκίμασε.");
+                } else {
+                    shop.deleteManufacturer(manufacturer);
+                    isDeleted = true;
+                    System.out.println("O κατασκευαστής διαγράφηκε επιτυχώς!");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Μη αριθμητικό ID! Παρακαλώ δώστε μόνο ψηφία.");
+            }
+        } while (!isDeleted);
+        
         pause();
     }
     

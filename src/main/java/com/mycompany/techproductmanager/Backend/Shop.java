@@ -242,6 +242,57 @@ public class Shop {
     }
     
     /**
+     * Ενημερώνει τα στοιχεία ενός υπάρχοντος κατασκευαστή στη βάση δεδομένων.
+     * Ο κατασκευαστής εντοπίζεται στη βάση με βάση το μοναδικό του ID.
+     *
+     * @param manufacturer Το αντικείμενο {@link Manufacturer} με τα ανανεωμένα στοιχεία.
+     */
+    public void updateManufacturer(Manufacturer manufacturer) {
+        String sql = "UPDATE manufacturers SET name = ?, email =? WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, manufacturer.getName());
+            pstmt.setString(2, manufacturer.getEmail());
+            
+            pstmt.setInt(3, manufacturer.getId());
+            
+            pstmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            System.out.println("Σφάλμα κατά τη διόρθωση κατασκευαστή: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Διαγράφει έναν κατασκευαστή από τη βάση δεδομένων.
+     * Λόγω του ON DELETE CASCADE στην SQL, αφαιρεί αυτόματα μέσω removeIf 
+     * και όλα τα εξαρτώμενα προϊόντα και τις πωλήσεις τους από τη μνήμη της Java.
+     *
+     * @param manufacturer Το αντικείμενο {@link Manufacturer} προς διαγραφή.
+     */
+    public void deleteManufacturer(Manufacturer manufacturer) {
+        String sql = "DELETE FROM manufacturers WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, manufacturer.getId());
+            pstmt.executeUpdate();
+
+            this.manufacturers.remove(manufacturer);
+            
+            this.sales.removeIf(sale -> sale.getProduct().getManufacturer().getId() == manufacturer.getId());
+            
+            this.products.removeIf(product -> product.getManufacturer().getId() == manufacturer.getId());
+
+        } catch (SQLException e) {
+            System.out.println("Σφάλμα κατά τη διαγραφή κατασκευαστή: " + e.getMessage());
+        }
+    }
+    
+    /**
      * Εισάγει ένα νέο προϊόν (Computer ή MobilePhone) στη βάση δεδομένων.
      * Διαχειρίζεται κατάλληλα τις NULL τιμές για τα πεδία που δεν ανήκουν 
      * στον συγκεκριμένο τύπο προϊόντος.
@@ -297,34 +348,31 @@ public class Shop {
      * @param product Το αντικείμενο {@link Product} με τα ανανεωμένα στοιχεία.
      */
     public void updateProduct(Product product) {
-        // ΔΙΟΡΘΩΣΗ: Αφαιρέθηκε η λάθος παρένθεση και προστέθηκε το = ? στο product_code
-        String sql = "UPDATE products SET product_type = ?, product_code = ?, name = ?, manufacturer_id = ?, price = ?, quantity = ?, ram_size = ?, storage_capacity = ?, camera_resolution = ?, color = ? WHERE id = ?";
+        String sql = "UPDATE products SET name = ?, manufacturer_id = ?, price = ?, quantity = ?, ram_size = ?, storage_capacity = ?, camera_resolution = ?, color = ? WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, product.productType());
-            pstmt.setString(2, product.getProductCode());
-            pstmt.setString(3, product.getName());
-            pstmt.setInt(4, product.getManufacturer().getId());
-            pstmt.setDouble(5, product.getPrice());
-            pstmt.setInt(6, product.getQuantity());
+            pstmt.setString(1, product.getName());
+            pstmt.setInt(2, product.getManufacturer().getId());
+            pstmt.setDouble(3, product.getPrice());
+            pstmt.setInt(4, product.getQuantity());
             if(product instanceof Computer) {
                 Computer x = (Computer) product;
-                pstmt.setInt(7, x.getRamSize());
-                pstmt.setInt(8, x.getStorageCapacity());
-                pstmt.setNull(9, java.sql.Types.INTEGER);
-                pstmt.setNull(10, java.sql.Types.VARCHAR);
+                pstmt.setInt(5, x.getRamSize());
+                pstmt.setInt(6, x.getStorageCapacity());
+                pstmt.setNull(7, java.sql.Types.INTEGER);
+                pstmt.setNull(8, java.sql.Types.VARCHAR);
             }
             if(product instanceof MobilePhone) {
                 MobilePhone x = (MobilePhone) product;
-                pstmt.setNull(7, java.sql.Types.INTEGER);
-                pstmt.setNull(8, java.sql.Types.INTEGER);
-                pstmt.setInt(9, x.getCameraResolution());
-                pstmt.setString(10, x.getColor());
+                pstmt.setNull(5, java.sql.Types.INTEGER);
+                pstmt.setNull(6, java.sql.Types.INTEGER);
+                pstmt.setInt(7, x.getCameraResolution());
+                pstmt.setString(8, x.getColor());
             }
             
-            pstmt.setInt(11, product.getId());
+            pstmt.setInt(9, product.getId());
             
             pstmt.executeUpdate();
             
