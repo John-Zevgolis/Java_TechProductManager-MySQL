@@ -182,7 +182,7 @@ public class Shop {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(selectSales);
-                 ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     int id = rs.getInt("id");
                     int pId = rs.getInt("product_id");
@@ -203,8 +203,6 @@ public class Shop {
                     }
                 }
             }
-
-            System.out.println("Τα δεδομένα φορτώθηκαν επιτυχώς από το TiDB Cloud!");
 
         } catch (SQLException e) {
             System.out.println("Σφάλμα κατά τη φόρτωση των δεδομένων από τη βάση: " + e.getMessage());
