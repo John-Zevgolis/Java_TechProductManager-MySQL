@@ -416,7 +416,7 @@ public class Shop {
 
         try (Connection conn = DBConnection.getConnection();
             PreparedStatement pstmtSale = conn.prepareStatement(insertSaleSql, Statement.RETURN_GENERATED_KEYS);
-            PreparedStatement pstmtProduct = conn.prepareStatement(updateProductSql)) { // <-- Τώρα είναι σωστό!
+            PreparedStatement pstmtProduct = conn.prepareStatement(updateProductSql)) {
 
             conn.setAutoCommit(false); 
 
