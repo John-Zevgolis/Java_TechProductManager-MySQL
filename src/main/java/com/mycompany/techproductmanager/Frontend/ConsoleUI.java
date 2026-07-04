@@ -1069,7 +1069,9 @@ public class ConsoleUI {
                 Product product = shop.getProduct(productId);
                 if(product == null) {
                     System.out.println("Λάθος ID! Δεν βρέθηκε προϊόν με αυτό το ID. Ξαναδοκίμασε.");
-                } else {
+                } else if (product.getQuantity() == 0) {
+                    System.out.println("Το προϊόν αυτό είναι εξαντλημένο! Παρακαλώ επιλέξτε άλλο.");
+            }    else {
                     isFound = true;
                 }
             } catch (NumberFormatException e) {
@@ -1080,27 +1082,32 @@ public class ConsoleUI {
         Product product = shop.getProduct(productId);
         
         int quantitySold = 0;
-        
-        try {
-            System.out.print("Δώσε ποσότητα τεμαχίων προς πώληση: ");
-            quantitySold = Integer.parseInt(scanner.nextLine());
-        } catch(NumberFormatException e) {
-            System.out.println("Άκυρη μορφή ποσότητας! Η πώληση ακυρώθηκε.");
-            pause();
-            return;
-        }
-        
-        if(quantitySold <= 0) {
-            System.out.println("Ακύρωση: Η ποσότητα πρέπει να είναι μεγαλύτερη από το μηδέν.");
-            pause();
-            return;
-        }
-        
-        if(quantitySold > product.getQuantity()) {
-            System.out.println("Ανεπαρκές απόθεμα! (Διαθέσιμα τεμάχια στην αποθήκη: " + product.getQuantity() + ")");
-            pause();
-            return;
-        }
+        boolean isValidQuantity = false;
+
+        do {
+            try {
+                System.out.print("Δώσε ποσότητα τεμαχίων προς πώληση: ");
+                quantitySold = Integer.parseInt(scanner.nextLine());
+
+                if (quantitySold == 0) {
+                    System.out.println("Η πώληση ακυρώθηκε.");
+                    pause();
+                    return;
+                }
+
+                if(quantitySold <= 0) {
+                    System.out.println("Ακύρωση: Η ποσότητα πρέπει να είναι μεγαλύτερη από το μηδέν.");
+                } else if(quantitySold > product.getQuantity()) {
+                    System.out.println("Ανεπαρκές απόθεμα! (Διαθέσιμα τεμάχια στην αποθήκη: " + product.getQuantity() + ")");
+                } else {
+                    isValidQuantity = true;
+                }
+            } catch(NumberFormatException e) {
+                System.out.println("Άκυρη μορφή ποσότητας! Παρακαλώ δώστε μόνο ψηφία.");
+                pause();
+                return;
+            }
+        } while(!isValidQuantity);
         
         product.setQuantity(product.getQuantity() - quantitySold);
         Sale sale = new Sale(product, quantitySold);

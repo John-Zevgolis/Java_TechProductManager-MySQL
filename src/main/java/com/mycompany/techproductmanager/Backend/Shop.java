@@ -411,23 +411,39 @@ public class Shop {
      * @param sale Το αντικείμενο {@link Sale} προς καταχώρηση.
      */
     public void insertSale(Sale sale) {
-        String sql = "INSERT INTO sales (product_id, quantity, sale_timestamp) VALUES (?, ?, ?)";
+        String insertSaleSql = "INSERT INTO sales (product_id, quantity, sale_timestamp) VALUES (?, ?, ?)";
+        String updateProductSql = "UPDATE products SET quantity = ? WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement pstmtSale = conn.prepareStatement(insertSaleSql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement pstmtProduct = conn.prepareStatement(updateProductSql)) { // <-- Τώρα είναι σωστό!
 
-            pstmt.setInt(1, sale.getProduct().getId());
-            pstmt.setInt(2, sale.getQuantity());
-            pstmt.setTimestamp(3, java.sql.Timestamp.valueOf(sale.getTimestamp()));
-            pstmt.executeUpdate();
+            conn.setAutoCommit(false); 
 
-            try (ResultSet keys = pstmt.getGeneratedKeys()) {
-                if (keys.next()) {
-                    sale.setId(keys.getInt(1));
+            try {
+                pstmtSale.setInt(1, sale.getProduct().getId());
+                pstmtSale.setInt(2, sale.getQuantity());
+                pstmtSale.setTimestamp(3, java.sql.Timestamp.valueOf(sale.getTimestamp()));
+                pstmtSale.executeUpdate();
+
+                try (ResultSet keys = pstmtSale.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        sale.setId(keys.getInt(1));
+                    }
                 }
-            }
 
-            this.sales.add(sale);
+                pstmtProduct.setInt(1, sale.getProduct().getQuantity()); 
+                pstmtProduct.setInt(2, sale.getProduct().getId());
+                pstmtProduct.executeUpdate();
+
+                conn.commit();
+                
+                this.sales.add(sale);
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
             
         } catch (SQLException e) {
             System.out.println("Σφάλμα κατά την εισαγωγή πώλησης: " + e.getMessage());
